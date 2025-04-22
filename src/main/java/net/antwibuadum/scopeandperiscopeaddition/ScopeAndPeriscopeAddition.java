@@ -1,10 +1,16 @@
 package net.antwibuadum.scopeandperiscopeaddition;
 
 import com.mojang.logging.LogUtils;
+import net.antwibuadum.scopeandperiscopeaddition.blocks.AddedBlocks;
+import net.antwibuadum.scopeandperiscopeaddition.blocks.AddedCreativeModTabs;
+import net.antwibuadum.scopeandperiscopeaddition.blocks.AddedItems;
 import net.minecraft.client.Minecraft;
+import net.minecraft.world.item.CreativeModeTab;
+import net.minecraft.world.item.CreativeModeTabs;
 import net.minecraft.world.level.block.Blocks;
 import net.minecraftforge.api.distmarker.Dist;
 import net.minecraftforge.common.MinecraftForge;
+import net.minecraftforge.event.BuildCreativeModeTabContentsEvent;
 import net.minecraftforge.event.server.ServerStartingEvent;
 import net.minecraftforge.eventbus.api.IEventBus;
 import net.minecraftforge.eventbus.api.SubscribeEvent;
@@ -31,11 +37,17 @@ public class ScopeAndPeriscopeAddition
     {
         IEventBus modEventBus = FMLJavaModLoadingContext.get().getModEventBus();
 
+        AddedCreativeModTabs.register(modEventBus);
+
+        AddedItems.register(modEventBus);
+        AddedBlocks.register(modEventBus);
+
         // Register the commonSetup method for modloading
         modEventBus.addListener(this::commonSetup);
 
         // Register ourselves for server and other game events we are interested in
         MinecraftForge.EVENT_BUS.register(this);
+        modEventBus.addListener(this::addCreative);
 
     }
 
@@ -45,6 +57,11 @@ public class ScopeAndPeriscopeAddition
         LOGGER.info("HELLO FROM COMMON SETUP");
     }
 
+    private void addCreative(BuildCreativeModeTabContentsEvent event) {
+        if (event.getTabKey() == CreativeModeTabs.INGREDIENTS) {
+            event.accept(AddedBlocks.SCOPE_BLOCK);
+        }
+    }
 
     // You can use SubscribeEvent and let the Event Bus discover methods to call
     @SubscribeEvent
